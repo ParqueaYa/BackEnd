@@ -1,5 +1,6 @@
 package org.example.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,12 +34,15 @@ public class Cliente {
     @Column(name = "fecha_creacion", updatable = false)
     private LocalDateTime fechaCreacion;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "cliente")
     private List<Vehiculo> vehiculos;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "cliente")
     private List<Mensualidad> mensualidades;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "cliente")
     private List<Factura> facturas;
 

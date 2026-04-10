@@ -1,5 +1,6 @@
 package org.example.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.List;
 
@@ -17,9 +18,11 @@ public class TipoVehiculo {
     @Column(length = 200)
     private String descripcion;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "tipoVehiculo")
     private List<Vehiculo> vehiculos;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "tipoVehiculo")
     private List<Tarifa> tarifas;
 

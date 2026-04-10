@@ -1,5 +1,6 @@
 package org.example.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,9 +36,11 @@ public class Vehiculo {
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "vehiculo")
     private List<RegistroParqueo> registros;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "vehiculo")
     private List<Mensualidad> mensualidades;
 
