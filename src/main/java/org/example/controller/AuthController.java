@@ -9,6 +9,8 @@ import org.example.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.Map;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -51,6 +53,26 @@ public class AuthController {
                     + "Cuando se active la seguridad, se obtendrá del token automáticamente.")
     public ResponseEntity<Usuario> obtenerPerfil(@RequestParam String email) {
         return ResponseEntity.ok(authService.obtenerPerfil(email));
+    }
+
+    @PostMapping("/forgot-password")
+    @Operation(summary = "Solicitar recuperación de contraseña",
+            description = "Genera un token de restablecimiento de contraseña simulado en la consola del backend y retorna un mensaje de éxito.")
+    public ResponseEntity<Map<String, String>> forgotPassword(@Valid @RequestBody ForgotPasswordRequestDTO dto) {
+        authService.solicitarRecuperacionPassword(dto.getEmail());
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Se han enviado las instrucciones de recuperación al correo electrónico.");
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/reset-password")
+    @Operation(summary = "Restablecer contraseña usando token",
+            description = "Recibe el token y la nueva contraseña para actualizar las credenciales de acceso.")
+    public ResponseEntity<Map<String, String>> resetPassword(@Valid @RequestBody ResetPasswordRequestDTO dto) {
+        authService.restablecerPassword(dto.getToken(), dto.getNewPassword());
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Contraseña restablecida exitosamente.");
+        return ResponseEntity.ok(response);
     }
 }
 

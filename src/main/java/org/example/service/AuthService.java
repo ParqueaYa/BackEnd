@@ -150,6 +150,51 @@ public class AuthService {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
     }
 
+    /**
+     * Iniciar proceso de recuperación de contraseña (generación de token)
+     */
+    public void solicitarRecuperacionPassword(String email) {
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con el email: " + email));
+
+        if (usuario.getAuthProvider() == AuthProvider.GOOGLE) {
+            throw new RuntimeException("Esta cuenta está registrada con Google. Por favor inicia sesión con Google.");
+        }
+
+        // Generar token único (UUID) y expira en 1 hora
+        String token = java.util.UUID.randomUUID().toString();
+        usuario.setResetPasswordToken(token);
+        usuario.setResetPasswordTokenExpiry(LocalDateTime.now().plusHours(1));
+        usuarioRepository.save(usuario);
+
+        // Simulación: Imprimir en consola el enlace
+        System.out.println("\n==========================================================================");
+        System.out.println("SOLICITUD DE RESTABLECIMIENTO DE CONTRASEÑA MOCK:");
+        System.out.println("Email: " + email);
+        System.out.println("Token: " + token);
+        System.out.println("Enlace: http://localhost:3000/auth/reset-password?token=" + token);
+        System.out.println("==========================================================================\n");
+    }
+
+    /**
+     * Restablecer contraseña con el token
+     */
+    public void restablecerPassword(String token, String newPassword) {
+        Usuario usuario = usuarioRepository.findByResetPasswordToken(token)
+                .orElseThrow(() -> new RuntimeException("Token de restablecimiento inválido o expirado."));
+
+        if (usuario.getResetPasswordTokenExpiry() == null || usuario.getResetPasswordTokenExpiry().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("El token ha expirado. Por favor, solicita un nuevo enlace.");
+        }
+
+        // Encriptar y guardar nueva contraseña
+        usuario.setPassword(passwordEncoder.encode(newPassword));
+        // Limpiar el token
+        usuario.setResetPasswordToken(null);
+        usuario.setResetPasswordTokenExpiry(null);
+        usuarioRepository.save(usuario);
+    }
+
     // ---- Métodos privados ----
 
     private GoogleIdToken.Payload verifyGoogleToken(String idTokenString) {
