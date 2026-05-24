@@ -23,6 +23,7 @@ public class RegistroUsuarioDTO {
     private String nombre;
 
     @Schema(description = "Apellido del usuario", example = "García")
+    @NotBlank(message = "El apellido es obligatorio")
     private String apellido;
 
     @Schema(description = "Rol del usuario: ADMIN, OPERADOR o CLIENTE", example = "OPERADOR")
